@@ -10,12 +10,13 @@ function clear() {
         $_POST[$key] = mysqli_real_escape_string($db, $value);
     }
 }
-// функция для записи в users если аватар выбран 
+// функция для записи в users если аватар выбран
 function save_user($file) {
     global $db;
     clear();
     extract($_POST); // функция берёт ключи и делает из них переменные
-    $query = "INSERT INTO users (name, image) VALUES ('$name','{$file['name']}')";
+    $pas = password_hash($password, PASSWORD_DEFAULT); // функция создает хеш пароля
+    $query = "INSERT INTO users (name, password, image) VALUES ('$name', '$pas', '{$file['name']}')";
     mysqli_query($db, $query);
 }
 // функция для записи данных в messangers
@@ -30,7 +31,7 @@ function save_mess() {
     $query = "INSERT INTO messanges (users_id, name_user, image_user, comment, data) VALUES ('$users_id', '$name_user', '$image_user', '$comment', '$data')";
     mysqli_query($db, $query);
 }
-// фукция выбора из messangers 10 последних комментариев
+// фукция выбора из messangers 20 последних комментариев
 function get_mess() {
     global $db;
     $query = "SELECT * FROM messanges ORDER BY id DESC LIMIT 20";
@@ -63,7 +64,8 @@ function get_no_img() {
     global $db;
      clear();
     extract($_POST); // функция берёт ключи и делает из них переменные
-    $query = "INSERT INTO users (name, image) VALUES ('$name','no-image.png')";
+    $pas = password_hash($password, PASSWORD_DEFAULT); // функция создает хеш пароля
+    $query = "INSERT INTO users (name, password, image) VALUES ('$name', '$pas', 'no-image.png')";
     mysqli_query($db, $query);
 }
 // фукция копирует файл на сервер
@@ -75,6 +77,14 @@ function make_upload($file) {
 function search_user() {
     global $db;
     $query = "select * from users";
+    $res = mysqli_query($db, $query);
+    return mysqli_fetch_all($res, MYSQLI_ASSOC);
+}
+
+// фукция выбирает значения password из таблицы users по имени 
+function search_pas($nam) {
+    global $db;
+    $query = "select password from users WHERE name = '$nam'";
     $res = mysqli_query($db, $query);
     return mysqli_fetch_all($res, MYSQLI_ASSOC);
 }

@@ -5,7 +5,7 @@ require_once 'db.php';
 require_once 'functions.php';
 if (!empty($_POST)) {
     // записываем в переменную значение post
-    $stok = htmlspecialchars($_POST['name']);
+    $stok = htmlspecialchars(@$_REQUEST['name']);
     // получаем массив зарегистрированных пользователей
     $users = search_user();
     // возращаем массив из знач. name массива $users
@@ -21,7 +21,7 @@ if (!empty($_POST)) {
         //если имя пустое, значит файл по умолчанию
         if($_FILES['file']['name'] == '') {
             get_no_img($_FILES['file']);
-            $image_no = 'Если аватар не выбран, картинка устанавливаеться по умолчанию.';
+            $image_no = 'Если аватар не выбран, аватарка устанавливаеться по умолчанию.';
             $end_image_no = '<a href="entrance.php" class="imag-no">Войдите чтобы комментировать</a>';
         }else{
         $check = can_upload($_FILES['file']);
@@ -54,25 +54,19 @@ if (!empty($_POST)) {
       <title>Регистрация</title>
    </head>
    <body>
-      <header>
-         <nav aria-label="breadcrumb">
-            <div class="container">
-               <ol class="breadcrumb">
-                  <li class="breadcrumb-item"><a href="index.php">Комментарии</a></li>
-                  <li class="breadcrumb-item active" aria-current="page">Регистрация</li>
-                  <li class="breadcrumb-item"><a href="entrance.php">Вход</a></li>
-               </ol>
-            </div>
-         </nav>
-      </header>
-      <main>
          <div class="container">
             <section class="user comments">
                <div class="form-wrapper">
                   <div class="title">
                      <h2>Регистрация</h2>
-                     <p>Отработка функций</p>
                   </div>
+                  <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                           <li class="breadcrumb-item"><a href="index.php">Комментарии</a></li>
+                           <li class="breadcrumb-item active" aria-current="page">Регистрация</li>
+                           <li class="breadcrumb-item"><a href="entrance.php">Вход</a></li>
+                        </ol>
+                  </nav>
                   <form action="" enctype="multipart/form-data" method="post" class="needs-validation" novalidate>
                      <div class="form-row">
                         <div class="col-md-6">
@@ -86,7 +80,18 @@ if (!empty($_POST)) {
                            <div class="form-item" style="margin-top: 10px;"><span style="color: red;"><?= @$name_user_erroy; ?><?= @$end_user; ?></span></div>
                         </div>
                      </div>
-                     <div class="form-row">
+                     <div class="form-row" style="margin-top: 15px;">
+                        <div class="col-md-6">
+                        <input type="password" class="form-control" id="validationCustom02" name="password" placeholder="Пароль" required>
+                        <div class="valid-feedback">
+                           Пароль не указан!
+                        </div>
+                        <div class="invalid-feedback">
+                           Вы не указали ваш пароль!
+                        </div>
+                        </div>
+                      </div>
+                     <div class="form-row" style="margin-top: 15px;">
                         <div class="col-md-6 mb-3">
                            <ul class="form-file">
                               <li class="form-file--item"><label for="inputFile">Ваш аватар </label></li>
@@ -101,7 +106,6 @@ if (!empty($_POST)) {
                </div>
             </section>
          </div>
-      </main>
       <!-- Optional JavaScript -->
       <!-- jQuery first, then Popper.js, then Bootstrap JS -->
       <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>

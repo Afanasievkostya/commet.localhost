@@ -3,26 +3,15 @@ header("Content-type: text/html; charset=utf-8");
 error_reporting(-1);
 require_once 'db.php';
 require_once 'functions.php';
-// записываем в переменную значение get
-$stok = htmlspecialchars(@$_GET['name']);
-// получаем массив зарегистрированных пользователей
-$users = search_user();
-// возращаем массив из знач. name массива $users
-$users_name = array_column($users, 'name');
-// проверяем существует ли в массиве имя
-$name = in_array($stok, $users_name, true);
-//если существует то
-if(!empty($_GET)) {
-    if ($name) {
-        $name_user = '<p style="color: green;">Добро пожаловать: <span style="font-size: 18px; font-weight: bold;">' . $stok . '</span></p>';
-        $submit_comm = '<button type="submit" class="btn btn-success">Отправить</button>';
-    } else {
-        $name_user_erroy = '<p class="nameErroy" style="font-size: 18px; color: red;">' . $stok . ' чтобы комментировать, пожалуйста зарегистрируйтесь<a href="index.php">сбросить</a></p>';
-    }
+if (!empty($_GET)) {
+    // записываем в переменную значение get
+    $stok = htmlspecialchars(@$_REQUEST['name']);
+    $name_user = '<p style="color: green;">Добро пожаловать: <span style="font-size: 18px; font-weight: bold;">' . $stok . '</span></p>';
+    $submit_comm = '<button type="submit" class="btn btn-success">Отправить</button>';
 }
-// находим ключ активного элемента массива $users
-$key = array_search($stok, array_column($users, 'name'));
 if (!empty($_POST)) {
+    // находим ключ активного элемента массива $users
+    $key = @array_search($stok, @array_column($users, 'name'));
     // создаём массив $_POST
     $_POST['id'] = $key;
     $_POST['users_id'] = $users[$_POST['id']]['id'];
@@ -50,25 +39,19 @@ $sum = count(get_sum()); // колличество комментариев
       <title>Комментарии</title>
    </head>
    <body>
-      <header>
-         <nav aria-label="breadcrumb">
-            <div class="container">
-               <ol class="breadcrumb">
-                  <li class="breadcrumb-item active" aria-current="page">Комментарии</li>
-                  <li class="breadcrumb-item"><a href="user.php">Регистрация</a></li>
-                  <li class="breadcrumb-item"><a href="entrance.php">Вход</a></li>
-               </ol>
-            </div>
-         </nav>
-      </header>
-      <main>
          <div class="container">
             <section class="comments">
                <div class="form-wrapper">
                   <div class="title">
                      <h2>Комментарии</h2>
-                     <p>Учебный проект на PHP</p>
                   </div>
+                  <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                           <li class="breadcrumb-item active" aria-current="page">Комментарии</li>
+                           <li class="breadcrumb-item"><a href="user.php">Регистрация</a></li>
+                           <li class="breadcrumb-item"><a href="entrance.php">Вход</a></li>
+                        </ol>
+                  </nav>
                   <!--Блок формы комментарий-->
                   <form  action="" method="post" class="needs-validation" novalidate>
                      <fieldset class="commentForm">
@@ -97,7 +80,6 @@ $sum = count(get_sum()); // колличество комментариев
                         </div>
                         <?= @$name_user; ?>
                         <?= @$submit_comm; ?>
-                        <?= @$name_user_erroy; ?>
                      </fieldset>
                   </form>
                </div>
@@ -106,8 +88,8 @@ $sum = count(get_sum()); // колличество комментариев
                   <h3>Последние 20 комментарий</h3>
                </div>
                <div class="wrapper">
-                  <?php if(isset($messanges)): ?>
-                  <?php foreach($messanges as $messange): ?>
+                  <?php if (isset($messanges)): ?>
+                  <?php foreach ($messanges as $messange): ?>
                   <div class="card-wrapper">
                      <div class="card-image">
                         <img src="img/<?= htmlspecialchars($messange['image_user']); ?>" alt="">
@@ -127,7 +109,6 @@ $sum = count(get_sum()); // колличество комментариев
                </div>
             </section>
          </div>
-      </main>
       <!-- Optional JavaScript -->
       <!-- jQuery first, then Popper.js, then Bootstrap JS -->
       <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
