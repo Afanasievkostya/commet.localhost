@@ -3,22 +3,28 @@ header("Content-type: text/html; charset=utf-8");
 error_reporting(-1);
 require_once 'db.php';
 require_once 'functions.php';
-if (!empty($_GET)) {
-    // записываем в переменную значение get
+
+    // записываем в переменную значение post
     $stok = htmlspecialchars(@$_REQUEST['name']);
+    // получаем массив зарегистрированных пользователей
+    $users = search_user();
+
+if (!empty($_GET)) {
     $name_user = '<p style="color: green;">Добро пожаловать: <span style="font-size: 18px; font-weight: bold;">' . $stok . '</span></p>';
     $submit_comm = '<button type="submit" class="btn btn-success">Отправить</button>';
 }
+
 if (!empty($_POST)) {
     // находим ключ активного элемента массива $users
-    $key = @array_search($stok, @array_column($users, 'name'));
+    $key_user = @array_search($stok, @array_column($users, 'name'));
     // создаём массив $_POST
-    $_POST['id'] = $key;
+    $_POST['id'] = $key_user;
     $_POST['users_id'] = $users[$_POST['id']]['id'];
     $_POST['name_user'] = $stok;
     $_POST['image_user'] = $users[$_POST['id']]['image'];
     // записываем данные в БД
     save_mess();
+    
     header("Location: index.php?name={$stok}");
     exit;
 }
