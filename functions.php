@@ -81,10 +81,17 @@ function search_user() {
     return mysqli_fetch_all($res, MYSQLI_ASSOC);
 }
 
-// фукция выбирает значения password из таблицы users по имени 
+// фукция выбирает значения password из таблицы users по имени
 function search_pas($nam) {
     global $db;
     $query = "select password from users WHERE name = '$nam'";
     $res = mysqli_query($db, $query);
     return mysqli_fetch_all($res, MYSQLI_ASSOC);
+}
+
+// функция для удаления комментариев
+function remove_mess($del) {
+   global $db;
+   $query="delete from messanges where id='$del'";
+   $res = mysqli_query($db, $query);
 }

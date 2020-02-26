@@ -8,10 +8,21 @@ require_once 'functions.php';
     $stok = htmlspecialchars(@$_REQUEST['name']);
     // получаем массив зарегистрированных пользователей
     $users = search_user();
+    // выводим массив $messange
+    $messanges = get_mess();
+    // колличество комментариев
+    $sum = count(get_sum());
 
 if (!empty($_GET)) {
     $name_user = '<p style="color: green;">Добро пожаловать: <span style="font-size: 18px; font-weight: bold;">' . $stok . '</span></p>';
     $submit_comm = '<button type="submit" class="btn btn-success">Отправить</button>';
+}
+
+if (!empty($_GET['delete'])) {
+  $id_mess = $_GET['delete'];
+  remove_mess($id_mess);
+  header("Location: index.php?name=admin");
+  exit;
 }
 
 if (!empty($_POST)) {
@@ -24,12 +35,11 @@ if (!empty($_POST)) {
     $_POST['image_user'] = $users[$_POST['id']]['image'];
     // записываем данные в БД
     save_mess();
-    
+
     header("Location: index.php?name={$stok}");
     exit;
 }
-$messanges = get_mess(); // выводим массив
-$sum = count(get_sum()); // колличество комментариев
+
 ?>
 
 <!doctype html>
@@ -102,8 +112,18 @@ $sum = count(get_sum()); // колличество комментариев
                      </div>
                      <div class="card message">
                         <div class="card-header text-muted">
+                          <div>
                            <p class="text-weight"><?= htmlspecialchars($messange['name_user']); ?></p>
                            <p class="text-weight data"><?= $messange['data']; ?></p>
+                          </div>
+                           <div class="text-remove">
+                             <?php
+                               $key_mess = $messange['id'];
+                               if (@$_GET['name'] == 'admin') {
+                                  echo '<a href="?delete='.$key_mess.'">Удалить</a>';
+                               }
+                            ?>
+                           </div>
                         </div>
                         <div class="card-body">
                            <?= nl2br(htmlspecialchars($messange['comment'])); ?>
