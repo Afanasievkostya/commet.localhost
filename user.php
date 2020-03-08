@@ -5,7 +5,9 @@ require_once 'db.php';
 require_once 'functions.php';
 if (!empty($_POST)) {
     // записываем в переменную значение post
-    $stok = htmlspecialchars(@$_REQUEST['name']);
+    $stok = @$_REQUEST['name'];
+    // шифрование имени
+    $stok = base64_encode($stok);
     // получаем массив зарегистрированных пользователей
     $users = search_user();
     // возращаем массив из знач. name массива $users
@@ -18,11 +20,11 @@ if (!empty($_POST)) {
         $end_user = '<a href="user.php" class="end-user">&times;</a>';
     } else {
         // проверяем, можно ли загружать изображение
-        //если имя пустое, значит файл по умолчанию
+        //если файл не выбран, значит файл по умолчанию
         if($_FILES['file']['name'] == '') {
             get_no_img($_FILES['file']);
             $image_no = 'Если аватар не выбран, аватарка устанавливаеться по умолчанию.';
-            $end_image_no = '<a href="entrance.php" class="imag-no">Войдите чтобы комментировать</a>';
+            $end_image_no = '<a href="index.php?name='.$stok.'" class="imag-no">Войдите чтобы комментировать</a>';
         }else{
         $check = can_upload($_FILES['file']);
         if ($check === true) {
@@ -30,7 +32,7 @@ if (!empty($_POST)) {
             make_upload($_FILES['file']);
             //  записываем данные в БД
             save_user($_FILES['file']);
-            header("Location: index.php");
+            header("Location: index.php?name={$stok}");
             exit;
         } else {
             $erroy = $check;
@@ -97,7 +99,7 @@ if (!empty($_POST)) {
                               <li class="form-file--item"><label for="inputFile">Ваш аватар </label></li>
                               <li class="form-file--item"><input type="file" id="inputFile" name="file"></li>
                               <li class="form-file--item" style="margin-top: 10px;"><span style="color: red;"><?= @$erroy; ?><?= @$end; ?></span></li>
-                              <li class="form-file--item" style="margin-top: 10px; color: #ccc;"><?= @$image_no; ?><?= @$end_image_no; ?></li>
+                              <li class="form-file--item" style="margin-top: 10px;"><?= @$image_no; ?><?= @$end_image_no; ?></li>
                            </ul>
                         </div>
                      </div>

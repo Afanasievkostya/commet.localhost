@@ -1,4 +1,7 @@
 <?php
+// безопасность
+require_once 'mysql_helper.php';
+
 // удобочитаемая функция информации о переменной
 function debug($arr) {
     echo '<pre>' . print_r($arr, true) . '</pre>';
@@ -15,9 +18,24 @@ function save_user($file) {
     global $db;
     clear();
     extract($_POST); // функция берёт ключи и делает из них переменные
+    $name = htmlspecialchars($name); // функция Преобразует специальные символы в HTML-сущности
+    $name = base64_encode($name); // функция шифрование имени
     $pas = password_hash($password, PASSWORD_DEFAULT); // функция создает хеш пароля
-    $query = "INSERT INTO users (name, password, image) VALUES ('$name', '$pas', '{$file['name']}')";
-    mysqli_query($db, $query);
+    $query = "INSERT INTO users (name, password, image) VALUES (?, ?, '{$file['name']}')";
+    $stmt = db_get_prepare_stmt($db, $query, [$name, $pas]);
+    mysqli_stmt_execute($stmt);
+}
+// функция для записи в users если аватар не выбран
+function get_no_img() {
+    global $db;
+    clear();
+    extract($_POST); // функция берёт ключи и делает из них переменные
+    $name = htmlspecialchars($name); // функция Преобразует специальные символы в HTML-сущности
+    $name = base64_encode($name); // функция шифрование имени
+    $pas = password_hash($password, PASSWORD_DEFAULT); // функция создает хеш пароля
+    $query = "INSERT INTO users (name, password, image) VALUES (?, ?, 'no-image.png')";
+    $stmt = db_get_prepare_stmt($db, $query, [$name, $pas]);
+    mysqli_stmt_execute($stmt);
 }
 // функция для записи данных в messangers
 function save_mess() {
@@ -28,6 +46,7 @@ function save_mess() {
     $data = date("d.m.Y");
     $_mD = date(".m.");
     $data = str_replace($_mD, " " . $_monthsList[$_mD] . " ", $data);
+    $comment = nl2br(htmlspecialchars($comment)); // Вставляет HTML-код разрыва строки и Преобразует специальные символы в HTML-сущности
     $query = "INSERT INTO messanges (users_id, name_user, image_user, comment, data) VALUES ('$users_id', '$name_user', '$image_user', '$comment', '$data')";
     mysqli_query($db, $query);
 }
@@ -59,15 +78,6 @@ function can_upload($file) {
     if (!in_array($mime, $types)) return 'Недопустимый тип файла.';
     return true;
 }
-// функция для записи users если не выбран файл
-function get_no_img() {
-    global $db;
-     clear();
-    extract($_POST); // функция берёт ключи и делает из них переменные
-    $pas = password_hash($password, PASSWORD_DEFAULT); // функция создает хеш пароля
-    $query = "INSERT INTO users (name, password, image) VALUES ('$name', '$pas', 'no-image.png')";
-    mysqli_query($db, $query);
-}
 // фукция копирует файл на сервер
 function make_upload($file) {
     global $db;
@@ -80,15 +90,15 @@ function search_user() {
     $res = mysqli_query($db, $query);
     return mysqli_fetch_all($res, MYSQLI_ASSOC);
 }
-
 // фукция выбирает значения password из таблицы users по имени
-function search_pas($nam) {
+function search_pas($name) {
     global $db;
-    $query = "select password from users WHERE name = '$nam'";
-    $res = mysqli_query($db, $query);
-    return mysqli_fetch_all($res, MYSQLI_ASSOC);
+    $query = 'select * from users WHERE name = ?';
+    $stmt = db_get_prepare_stmt($db, $query, [$name]);
+    mysqli_stmt_execute($stmt);
+    $res = mysqli_stmt_get_result($stmt);
+  return mysqli_fetch_assoc($res);
 }
-
 // функция для удаления комментариев
 function remove_mess($del) {
    global $db;

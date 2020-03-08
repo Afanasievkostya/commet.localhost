@@ -5,7 +5,9 @@ require_once 'db.php';
 require_once 'functions.php';
 if (!empty($_GET)) {
     // записываем в переменную значение get
-    $stok = htmlspecialchars(@$_REQUEST['name']);
+    $stok = $_GET['name'];
+    // шифрование имени
+    $stok = base64_encode($stok);
     // получаем массив зарегистрированных пользователей
     $users = search_user();
     // возращаем массив из знач. name массива $users
@@ -14,12 +16,16 @@ if (!empty($_GET)) {
     $name = in_array($stok, $users_name, true);
     // выбираем массив с именем зарегистрированным пользователем
     $pas = search_pas($stok);
+
     // ищем ключ массива
-    $key = key($pas);
+    // $key = key($pas);
+    // ищем id ключа массива
+    // $id = $pas[$key]['id'];
+
     // проверяем если не существует  имя то
     if (!$name) {
-        $name_user_erroy = '<p class="nameErroy" style="font-size: 18px; color: red;">' . $stok . ' чтобы комментировать, пожалуйста зарегистрируйтесь. <a href="user.php">Перейти к регистрации.</a></p>';
-    } elseif (!password_verify($_GET['password'], $pas[$key]['password'])) {
+        $name_user_erroy = '<p class="nameErroy" style="font-size: 18px; color: red;">' .base64_decode($stok). ' чтобы комментировать, пожалуйста зарегистрируйтесь. <a href="user.php">Перейти к регистрации.</a></p>';
+    } elseif (!password_verify($_GET['password'], $pas['password'])) {
         // проверяем пароль пользователя с введённым, если не совподает, то
         $password_user_erroy =  '<p class="nameErroy" style="font-size: 18px; color: red;">Не верный пароль</p>';
         $end_password = '<a href="entrance.php" class="end-user">&times;</a>';
@@ -56,11 +62,11 @@ if (!empty($_GET)) {
                            <li class="breadcrumb-item active" aria-current="page">Вход</li>
                         </ol>
                   </nav>
-                  <form action="" method="get" class="needs-validation" novalidate>
+                  <form action="" method="get" class="needs-validation" novalidate name="ent">
                      <div class="form-row">
                        <?php $value = isset($stok) ? $stok : ''; ?>
                         <div class="col-md-4 mb-3">
-                           <input type="text" class="form-control" id="validationCustom01" name="name" placeholder="Ваше имя" value="<?= @$stok; ?>" required>
+                           <input type="text" class="form-control" id="validationCustom01" name="name" placeholder="Ваше имя" value="<?= @base64_decode($stok); ?>" required>
                            <div class="valid-feedback">
                               Имя указано!
                            </div>
