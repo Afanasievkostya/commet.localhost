@@ -132,7 +132,7 @@ legend {
 }
 
 .text-remove a {
-  margin-right: 10px; 
+  margin-right: 10px;
   text-decoration: none;
   font-size: 12px;
   text-transform: uppercase;
@@ -157,6 +157,10 @@ legend {
   /* overflow: auto;
   height: 790px; */
   /*box-shadow: 3px 3px 15px 3px #ccc;*/
+}
+
+.wrapper-form {
+  margin-top: 30px;
 }
 
 .form-item span {
